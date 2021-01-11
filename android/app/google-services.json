@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "905450090650",
+    "firebase_url": "https://deliverly-cbda7.firebaseio.com",
+    "project_id": "deliverly-cbda7",
+    "storage_bucket": "deliverly-cbda7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905450090650:android:d2e6e2388ef28285c62f23",
+        "android_client_info": {
+          "package_name": "com.thaviosuk.consumer_delivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "905450090650-s6fpv9rdrfq8a094pu6nj8ma998nj9mp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWb4tImTkRYYlsCtNfspgG1x7YiIXDRqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "905450090650-s6fpv9rdrfq8a094pu6nj8ma998nj9mp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
