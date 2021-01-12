@@ -6,6 +6,7 @@ class Detail extends StatefulWidget {
 }
 
 class _DetailState extends State<Detail> {
+
   var count = 0;
   bool count_staus = true;
 
@@ -29,6 +30,10 @@ class _DetailState extends State<Detail> {
       });
     }
   }
+
+  
+
+
 
   @override
   void initState() {

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:consumer_delivery/model/Distributor.dart';
 import 'package:consumer_delivery/model/Item.dart';
+import 'package:consumer_delivery/model/ItemBrand.dart';
+import 'package:consumer_delivery/model/ItemType.dart';
 import 'package:consumer_delivery/model/Login.dart';
 import 'package:consumer_delivery/model/OrderTemp.dart';
 import 'package:consumer_delivery/model/Shop.dart';
@@ -12,9 +14,11 @@ import 'package:flutter/material.dart';
 class apiCall {
   static UserLogin _userlogin = new UserLogin();
   static Item _item;
+  static ITemBrand _iTemBrand;
   static OrderTemp _orderTemp;
   static Shop _shop;
   static Distributor _distributor = new Distributor();
+  static ITemType _iTemType;
 
   static Future<UserLogin> login(var user, var password) async {
     var dio = new Dio();
@@ -58,6 +62,79 @@ class apiCall {
     } on DioError catch (e) {
       print(e);
       return _item;
+    }
+  }
+
+  static Future<ITemBrand> getItemBrandByID(var itemID) async {
+    var dio = new Dio();
+    print('call api get item BrandByID');
+
+    var data = {
+      "ITEM_TYPE_ID": itemID
+    };
+
+    try {
+      Response response = await dio.post(
+        ShareUrl.getItemBrand,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      _iTemBrand = ITemBrand.fromJson(response.data);
+
+      return _iTemBrand;
+    } on DioError catch (e) {
+      print(e);
+      return _iTemBrand;
+    }
+  }
+
+  static Future<Item> getItemByType(var id) async {
+    var dio = new Dio();
+    print('=== call api get Item by ItemTypeID ');
+    var data = {
+
+        "ITEM_TYPE_ID": id
+
+    };
+    print(data);
+    try {
+      Response response = await dio.post(
+        ShareUrl.getItem,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      print(response.data);
+      _item = Item.fromJson(response.data);
+
+      return _item;
+    } on DioError catch (e) {
+      print(e);
+      return _item;
+    }
+  }
+
+  static Future<ITemType> getAllItemType() async {
+    var dio = new Dio();
+    print('call api');
+
+    try {
+      Response response = await dio.post(
+        ShareUrl.getItemType,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        //data: jsonEncode(data),
+      );
+      _iTemType = ITemType.fromJson(response.data);
+
+      return _iTemType;
+    } on DioError catch (e) {
+      print(e);
+      return _iTemType;
     }
   }
 
