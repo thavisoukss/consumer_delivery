@@ -65,39 +65,10 @@ class apiCall {
     }
   }
 
-  static Future<ITemBrand> getItemBrandByID(var itemID) async {
-    var dio = new Dio();
-    print('call api get item BrandByID');
-
-    var data = {
-      "ITEM_TYPE_ID": itemID
-    };
-
-    try {
-      Response response = await dio.post(
-        ShareUrl.getItemBrand,
-        options: Options(headers: {
-          HttpHeaders.contentTypeHeader: "application/json",
-        }),
-        data: jsonEncode(data),
-      );
-      _iTemBrand = ITemBrand.fromJson(response.data);
-
-      return _iTemBrand;
-    } on DioError catch (e) {
-      print(e);
-      return _iTemBrand;
-    }
-  }
-
   static Future<Item> getItemByType(var id) async {
     var dio = new Dio();
     print('=== call api get Item by ItemTypeID ');
-    var data = {
-
-        "ITEM_TYPE_ID": id
-
-    };
+    var data = {"ITEM_TYPE_ID": id};
     print(data);
     try {
       Response response = await dio.post(
@@ -114,6 +85,75 @@ class apiCall {
     } on DioError catch (e) {
       print(e);
       return _item;
+    }
+  }
+
+  static Future<Item> getItemByID(var id) async {
+    var dio = new Dio();
+    print('=== call api get Item by ID ');
+    var data = {"ID": id};
+    print(data);
+    try {
+      Response response = await dio.post(
+        ShareUrl.getItem,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      print(response.data);
+      _item = Item.fromJson(response.data);
+
+      return _item;
+    } on DioError catch (e) {
+      print(e);
+      return _item;
+    }
+  }
+
+  static Future<Item> getItemByItemCode(var id) async {
+    var dio = new Dio();
+    print('=== call api get Item by ID ');
+    var data = {"ID": id};
+    print(data);
+    try {
+      Response response = await dio.post(
+        ShareUrl.getItem,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      print(response.data);
+      _item = Item.fromJson(response.data);
+
+      return _item;
+    } on DioError catch (e) {
+      print(e);
+      return _item;
+    }
+  }
+
+  static Future<ITemBrand> getItemBrandByID(var itemID) async {
+    var dio = new Dio();
+    print('call api get item BrandByID');
+
+    var data = {"ITEM_TYPE_ID": itemID};
+
+    try {
+      Response response = await dio.post(
+        ShareUrl.getItemBrand,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      _iTemBrand = ITemBrand.fromJson(response.data);
+
+      return _iTemBrand;
+    } on DioError catch (e) {
+      print(e);
+      return _iTemBrand;
     }
   }
 

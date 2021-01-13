@@ -1,4 +1,8 @@
+import 'package:consumer_delivery/model/Item.dart' as item;
+import 'package:consumer_delivery/model/OrderTemp.dart';
+import 'package:consumer_delivery/share/saveUser.dart';
 import 'package:flutter/material.dart';
+import 'package:consumer_delivery/apiCall/api.dart';
 
 class Order1 extends StatefulWidget {
   @override
@@ -6,6 +10,97 @@ class Order1 extends StatefulWidget {
 }
 
 class _Order1State extends State<Order1> {
+  item.Item items;
+  List<item.Data> _listitem = [];
+
+  OrderTemp orderTemp;
+  List<Data> _listorderTempData = [];
+  Data orderTempData = new Data();
+  String user;
+
+  _getSharUsr() async {
+    String us = "username";
+    getUser(shareName: us).then((result) {
+      setState(() {
+        user = result;
+        print('usrname');
+        print(user);
+      });
+    });
+  }
+
+  Future _getOrderTemp() async {
+    await _getSharUsr();
+    apiCall.getOrderTemp(username: user).then((value) {
+      setState(() {
+        orderTemp = value;
+        _listorderTempData = orderTemp.data;
+      });
+    });
+  }
+
+  Future _orderTemp(
+      var id, name, barCode, ccy, user_name, unit, price, prices) async {
+    var orderNo;
+    orderNo = orderTemp.data[0].oRDERNO;
+    var res = apiCall.orderTemp(
+        item_id: id,
+        item_name: name,
+        item_barcode: barCode,
+        order_no: orderNo,
+        ccy: ccy,
+        user_name: user_name,
+        unit: unit,
+        price: price,
+        prices: prices);
+    // get order temp
+    _getOrderTemp();
+  }
+
+  Future _getITemByID(var id) async {
+    items = await apiCall.getItemByID(id);
+    setState(() {
+      _listitem = items.data;
+    });
+  }
+
+  Future _minus(var amount, itemCode) async {
+    if (amount == 1) {
+      // not do anything
+    } else {
+      // minus order
+      await _orderTemp(
+          itemCode,
+          _listorderTempData[0].iTEMNAME,
+          _listorderTempData[0].iTEMCODE,
+          _listorderTempData[0].cCY,
+          user,
+          -1,
+          _listorderTempData[0].pRICE,
+          _listorderTempData[0].pRICE * -1);
+    }
+  }
+
+  Future _plus(var itemCode) async {
+    // minus order
+    await _orderTemp(
+        itemCode,
+        _listorderTempData[0].iTEMNAME,
+        _listorderTempData[0].iTEMCODE,
+        _listorderTempData[0].cCY,
+        user,
+        1,
+        _listorderTempData[0].pRICE,
+        _listorderTempData[0].pRICE);
+  }
+
+  @override
+  void initState() {
+    _getOrderTemp();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,10 +130,6 @@ class _Order1State extends State<Order1> {
             _header(),
             _divider(),
             _detail(),
-            _divider(),
-            _detail(),
-            _divider(),
-            _detail(),
           ],
         ),
       ),
@@ -51,6 +142,16 @@ class _Order1State extends State<Order1> {
       child: Divider(
         color: Colors.green,
         thickness: 1,
+      ),
+    );
+  }
+
+  Widget _divider1() {
+    return Padding(
+      padding: EdgeInsets.only(left: 60, right: 60),
+      child: Divider(
+        color: Colors.green,
+        thickness: 0.5,
       ),
     );
   }
@@ -88,14 +189,16 @@ class _Order1State extends State<Order1> {
                     padding: EdgeInsets.only(right: 20),
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(
-                        '36,350.00',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xffff3300),
-                        ),
-                      ),
+                      child: orderTemp == null
+                          ? Text('')
+                          : Text(
+                              orderTemp.total.toString(),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xffff3300),
+                              ),
+                            ),
                     )),
               ))
         ],
@@ -104,34 +207,63 @@ class _Order1State extends State<Order1> {
   }
 
   Widget _detail() {
-    return Container(
-      height: 70,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(flex: 3, child: _left()),
-          Expanded(flex: 6, child: _center()),
-          Expanded(flex: 1, child: _right())
-        ],
-      ),
-    );
+    return _listorderTempData.isEmpty
+        ? Container()
+        : Container(
+            height: 350,
+            child: Column(
+              children: [
+                Container(
+                    height: 340,
+                    child: ListView.builder(
+                        itemCount: _listorderTempData.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            height: 80,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                        flex: 4,
+                                        child: _left(
+                                            _listorderTempData[index].iTEMNAME,
+                                            _listorderTempData[index].pRICE)),
+                                    Expanded(
+                                        flex: 5,
+                                        child: _center(
+                                            _listorderTempData[index].sUBTOTAL,
+                                            _listorderTempData[index].aMOUNT,
+                                            _listorderTempData[index].iTEMID)),
+                                    Expanded(flex: 1, child: _right())
+                                  ],
+                                ),
+                                _divider1(),
+                              ],
+                            ),
+                          );
+                        })),
+              ],
+            ),
+          );
   }
 
-  Widget _left() {
+  Widget _left(var itemName, var price) {
     return Padding(
       padding: EdgeInsets.only(top: 5, bottom: 5, left: 10),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             child: Text(
-              'ໄມ້ຖູເຮືອນ',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              itemName,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
           Container(
             child: Text(
-              '12.500.00',
+              price.toString(),
               style: TextStyle(color: Colors.grey),
             ),
           )
@@ -140,7 +272,7 @@ class _Order1State extends State<Order1> {
     );
   }
 
-  Widget _center() {
+  Widget _center(var subtotal, amount, itemCode) {
     return Padding(
       padding: EdgeInsets.only(top: 5, bottom: 5, left: 10),
       child: Column(
@@ -148,7 +280,7 @@ class _Order1State extends State<Order1> {
         children: [
           Container(
             child: Text(
-              '180,309.00',
+              subtotal.toString(),
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -159,40 +291,50 @@ class _Order1State extends State<Order1> {
               child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                    color: Color(0xff09b83e),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(3),
-                      bottomLeft: Radius.circular(3),
-                    )),
-                height: 30,
-                width: 30,
-                //color: Color(0xff09b83e),
-                child: Icon(
-                  Icons.remove_circle,
-                  color: Colors.white,
+              GestureDetector(
+                onTap: () {
+                  _minus(amount, itemCode);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Color(0xff09b83e),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(3),
+                        bottomLeft: Radius.circular(3),
+                      )),
+                  height: 30,
+                  width: 30,
+                  //color: Color(0xff09b83e),
+                  child: Icon(
+                    Icons.remove_circle,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Container(
                 height: 30,
                 width: 70,
                 color: Colors.grey[200],
-                child: Center(child: Text('20')),
+                child: Center(child: Text(amount.toString())),
               ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Color(0xff09b83e),
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(3),
-                      bottomRight: Radius.circular(3),
-                    )),
-                height: 30,
-                width: 30,
-                //color: Color(0xff09b83e),
-                child: Icon(
-                  Icons.add_circle,
-                  color: Colors.white,
+              GestureDetector(
+                onTap: () {
+                  _plus(itemCode);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Color(0xff09b83e),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(3),
+                        bottomRight: Radius.circular(3),
+                      )),
+                  height: 30,
+                  width: 30,
+                  //color: Color(0xff09b83e),
+                  child: Icon(
+                    Icons.add_circle,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
@@ -294,13 +436,15 @@ class _Order1State extends State<Order1> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(right: 10, top: 15),
+                    padding: const EdgeInsets.only(right: 15, top: 15),
                     child: Container(
-                      child: Text(
-                        '22,350.00',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 17),
-                      ),
+                      child: orderTemp == null
+                          ? Text('')
+                          : Text(
+                              orderTemp.total.toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 17),
+                            ),
                     ),
                   )
                 ]),
@@ -320,11 +464,13 @@ class _Order1State extends State<Order1> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(right: 10, top: 15),
+                  padding: const EdgeInsets.only(right: 15, top: 15),
                   child: Container(
-                    child: Text('22,350.00',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: orderTemp == null
+                        ? Text('')
+                        : Text(orderTemp.total.toString(),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                 )
               ],

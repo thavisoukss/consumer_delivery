@@ -1,14 +1,81 @@
+import 'package:consumer_delivery/model/Item.dart';
+import 'package:consumer_delivery/apiCall/api.dart';
+import 'package:consumer_delivery/share/saveUser.dart';
+import 'package:consumer_delivery/model/OrderTemp.dart' as Order;
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 class Detail extends StatefulWidget {
+  final int id;
+
+  const Detail({Key key, this.id}) : super(key: key);
+
   @override
   _DetailState createState() => _DetailState();
 }
 
 class _DetailState extends State<Detail> {
-
   var count = 0;
   bool count_staus = true;
+  var user;
+  var totalAmount = 0;
+
+  Item item;
+  List<Data> _listitem = [];
+  Order.OrderTemp orderTemp;
+
+  getItemByID(var id) async {
+    item = await apiCall.getItemByID(id);
+    setState(() {
+      _listitem = item.data;
+    });
+  }
+
+  _getUSer() async {
+    String us = "username";
+    getUser(shareName: us).then((result) {
+      user = result;
+    });
+  }
+
+  _getOrderTemp() async {
+    await _getUSer();
+    apiCall.getOrderTemp(username: user).then((value) {
+      setState(() {
+        orderTemp = value;
+        totalAmount = orderTemp.data.length;
+      });
+    });
+  }
+
+  Future<String> formatdate() async {
+    var now = new DateTime.now();
+    var formatter = new DateFormat('ddMMyyyyhhmm');
+    String formatted = formatter.format(now);
+    String order_ID = "WT" + formatted;
+    return order_ID;
+  }
+
+  _orderTemp(var id, name, barCode, ccy, user_name, unit, price, prices) async {
+    var orderNo;
+    if (orderTemp.data.isEmpty) {
+      await formatdate().then((value) {
+        orderNo = value;
+      });
+    } else {
+      orderNo = orderTemp.data[0].oRDERNO;
+    }
+    var res = apiCall.orderTemp(
+        item_id: id,
+        item_name: name,
+        item_barcode: barCode,
+        order_no: orderNo,
+        ccy: ccy,
+        user_name: user_name,
+        unit: unit,
+        price: price,
+        prices: prices);
+  }
 
   Future _minus() {
     setState(() {
@@ -31,14 +98,12 @@ class _DetailState extends State<Detail> {
     }
   }
 
-  
-
-
-
   @override
   void initState() {
     // TODO: implement initState
     count_staus = true;
+    getItemByID(widget.id);
+    _getOrderTemp();
     super.initState();
   }
 
@@ -54,11 +119,13 @@ class _DetailState extends State<Detail> {
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
-                    title: Text("ນາໍ້ປັ່ນ",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                        )),
+                    title: _listitem.isEmpty
+                        ? Text('')
+                        : Text(_listitem[0].iTEMNAME,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                            )),
                     background: Image.network(
                       "https://images.deliveryhero.io/image/fd-la/LH/z1pf-listing.jpg",
                       fit: BoxFit.cover,
@@ -117,7 +184,10 @@ class _DetailState extends State<Detail> {
                     padding: const EdgeInsets.only(left: 15),
                     child: Container(
                       width: 300,
-                      child: Text('ອາຫານປາ', style: TextStyle(fontSize: 16)),
+                      child: _listitem.isEmpty
+                          ? Text('')
+                          : Text(_listitem[0].iTEMNAME,
+                              style: TextStyle(fontSize: 16)),
                     ),
                   ),
                 ],
@@ -142,7 +212,10 @@ class _DetailState extends State<Detail> {
                     padding: EdgeInsets.only(left: 15),
                     child: Container(
                       width: 200,
-                      child: Text('ອາຫານປາ ', style: TextStyle(fontSize: 16)),
+                      child: _listitem.isEmpty
+                          ? Text('')
+                          : Text(_listitem[0].iTEMDESC,
+                              style: TextStyle(fontSize: 16)),
                     ),
                   ),
                 ],
@@ -168,7 +241,9 @@ class _DetailState extends State<Detail> {
                   Padding(
                     padding: const EdgeInsets.only(left: 15),
                     child: Container(
-                      child: Text('150,000 USD'),
+                      child: _listitem.isEmpty
+                          ? Text('')
+                          : Text(_listitem[0].iTEMPRICE.toString()),
                     ),
                   ),
                 ],
@@ -190,83 +265,97 @@ class _DetailState extends State<Detail> {
   Widget _controll() {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: Container(
-        decoration: BoxDecoration(
-            color: Color.fromRGBO(9, 184, 62, 50),
-            borderRadius: BorderRadius.circular(50)),
-        width: 200,
-        height: 60,
-        child: Row(
-          children: [
-            Expanded(
-                flex: 1,
-                child: count_staus
-                    ? GestureDetector(
-                        onTap: () {
-                          _minus();
-                        },
-                        child: Container(
-                            child: Icon(
-                          Icons.remove_circle,
-                          color: Colors.white,
-                          size: 40,
-                        )),
-                      )
-                    : Container(
-                        child: Icon(
-                        Icons.delete_forever,
+      child: totalAmount < 1
+          ? Container()
+          : Container(
+              decoration: BoxDecoration(
+                  color: Color.fromRGBO(9, 184, 62, 50),
+                  borderRadius: BorderRadius.circular(50)),
+              width: 200,
+              height: 60,
+              child: Row(
+                children: [
+                  Expanded(
+                      flex: 1,
+                      child: count_staus
+                          ? GestureDetector(
+                              onTap: () {
+                                _minus();
+                              },
+                              child: Container(
+                                  child: Icon(
+                                Icons.remove_circle,
+                                color: Colors.white,
+                                size: 40,
+                              )),
+                            )
+                          : Container(
+                              child: Icon(
+                              Icons.delete_forever,
+                              color: Colors.white,
+                              size: 40,
+                            ))),
+                  Expanded(
+                    flex: 1,
+                    child: Center(
+                      child: Container(
+                        child: Text(
+                          '' + count.toString(),
+                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: GestureDetector(
+                      onTap: () {
+                        _plus();
+                      },
+                      child: Container(
+                          child: Icon(
+                        Icons.add_circle,
                         color: Colors.white,
                         size: 40,
-                      ))),
-            Expanded(
-              flex: 1,
-              child: Center(
-                child: Container(
-                  child: Text(
-                    '' + count.toString(),
-                    style: TextStyle(fontSize: 17, color: Colors.white),
+                      )),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: GestureDetector(
-                onTap: () {
-                  _plus();
-                },
-                child: Container(
-                    child: Icon(
-                  Icons.add_circle,
-                  color: Colors.white,
-                  size: 40,
-                )),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
   Widget _add() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-      child: Container(
-          height: 50,
-          width: double.infinity,
-          child: RaisedButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            color: Color.fromRGBO(9, 184, 62, 50),
-            textColor: Colors.white,
-            child: Text(
-              'ເພີ່ມລາຍການ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            onPressed: () {},
-          )),
+      child: totalAmount < 1
+          ? Container()
+          : Container(
+              height: 50,
+              width: double.infinity,
+              child: RaisedButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                color: Color.fromRGBO(9, 184, 62, 50),
+                textColor: Colors.white,
+                child: Text(
+                  'ເພີ່ມລາຍການ',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  _orderTemp(
+                      _listitem[0].iD,
+                      _listitem[0].iTEMNAME,
+                      _listitem[0].iTEMBARCODE,
+                      _listitem[0].iTEMCCY,
+                      user,
+                      count,
+                      _listitem[0].iTEMPRICE,
+                      count * _listitem[0].iTEMPRICE);
+                },
+              )),
     );
   }
 }
