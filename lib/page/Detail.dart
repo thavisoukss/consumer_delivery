@@ -2,6 +2,7 @@ import 'package:consumer_delivery/model/Item.dart';
 import 'package:consumer_delivery/apiCall/api.dart';
 import 'package:consumer_delivery/share/saveUser.dart';
 import 'package:consumer_delivery/model/OrderTemp.dart' as Order;
+import 'package:consumer_delivery/utility/dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
@@ -58,6 +59,8 @@ class _DetailState extends State<Detail> {
 
   _orderTemp(var id, name, barCode, ccy, user_name, unit, price, prices) async {
     var orderNo;
+    var res;
+
     if (orderTemp.data.isEmpty) {
       await formatdate().then((value) {
         orderNo = value;
@@ -65,16 +68,26 @@ class _DetailState extends State<Detail> {
     } else {
       orderNo = orderTemp.data[0].oRDERNO;
     }
-    var res = apiCall.orderTemp(
-        item_id: id,
-        item_name: name,
-        item_barcode: barCode,
-        order_no: orderNo,
-        ccy: ccy,
-        user_name: user_name,
-        unit: unit,
-        price: price,
-        prices: prices);
+    apiCall
+        .orderTemp(
+            item_id: id,
+            item_name: name,
+            item_barcode: barCode,
+            order_no: orderNo,
+            ccy: ccy,
+            user_name: user_name,
+            unit: unit,
+            price: price,
+            prices: prices)
+        .then((value) {
+      res = value;
+
+      if (res == 'success') {
+        showSuccessMessage(context, 'ສັ່ງສີນຄ້າສຳເລັດ');
+      } else {
+        showErrorMessage(context, 'ສັ່ງສີນຄ້າບໍ່ສຳເລັດ');
+      }
+    });
   }
 
   Future _minus() {
@@ -265,97 +278,93 @@ class _DetailState extends State<Detail> {
   Widget _controll() {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: totalAmount < 1
-          ? Container()
-          : Container(
-              decoration: BoxDecoration(
-                  color: Color.fromRGBO(9, 184, 62, 50),
-                  borderRadius: BorderRadius.circular(50)),
-              width: 200,
-              height: 60,
-              child: Row(
-                children: [
-                  Expanded(
-                      flex: 1,
-                      child: count_staus
-                          ? GestureDetector(
-                              onTap: () {
-                                _minus();
-                              },
-                              child: Container(
-                                  child: Icon(
-                                Icons.remove_circle,
-                                color: Colors.white,
-                                size: 40,
-                              )),
-                            )
-                          : Container(
-                              child: Icon(
-                              Icons.delete_forever,
-                              color: Colors.white,
-                              size: 40,
-                            ))),
-                  Expanded(
-                    flex: 1,
-                    child: Center(
-                      child: Container(
-                        child: Text(
-                          '' + count.toString(),
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: GestureDetector(
-                      onTap: () {
-                        _plus();
-                      },
-                      child: Container(
-                          child: Icon(
-                        Icons.add_circle,
+      child: Container(
+        decoration: BoxDecoration(
+            color: Color.fromRGBO(9, 184, 62, 50),
+            borderRadius: BorderRadius.circular(50)),
+        width: 200,
+        height: 60,
+        child: Row(
+          children: [
+            Expanded(
+                flex: 1,
+                child: count_staus
+                    ? GestureDetector(
+                        onTap: () {
+                          _minus();
+                        },
+                        child: Container(
+                            child: Icon(
+                          Icons.remove_circle,
+                          color: Colors.white,
+                          size: 40,
+                        )),
+                      )
+                    : Container(
+                        child: Icon(
+                        Icons.delete_forever,
                         color: Colors.white,
                         size: 40,
-                      )),
-                    ),
+                      ))),
+            Expanded(
+              flex: 1,
+              child: Center(
+                child: Container(
+                  child: Text(
+                    '' + count.toString(),
+                    style: TextStyle(fontSize: 17, color: Colors.white),
                   ),
-                ],
+                ),
               ),
             ),
+            Expanded(
+              flex: 1,
+              child: GestureDetector(
+                onTap: () {
+                  _plus();
+                },
+                child: Container(
+                    child: Icon(
+                  Icons.add_circle,
+                  color: Colors.white,
+                  size: 40,
+                )),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _add() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-      child: totalAmount < 1
-          ? Container()
-          : Container(
-              height: 50,
-              width: double.infinity,
-              child: RaisedButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                color: Color.fromRGBO(9, 184, 62, 50),
-                textColor: Colors.white,
-                child: Text(
-                  'ເພີ່ມລາຍການ',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                onPressed: () {
-                  _orderTemp(
-                      _listitem[0].iD,
-                      _listitem[0].iTEMNAME,
-                      _listitem[0].iTEMBARCODE,
-                      _listitem[0].iTEMCCY,
-                      user,
-                      count,
-                      _listitem[0].iTEMPRICE,
-                      count * _listitem[0].iTEMPRICE);
-                },
-              )),
+      child: Container(
+          height: 50,
+          width: double.infinity,
+          child: RaisedButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            color: Color.fromRGBO(9, 184, 62, 50),
+            textColor: Colors.white,
+            child: Text(
+              'ເພີ່ມລາຍການ',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            onPressed: () {
+              _orderTemp(
+                  _listitem[0].iD,
+                  _listitem[0].iTEMNAME,
+                  _listitem[0].iTEMBARCODE,
+                  _listitem[0].iTEMCCY,
+                  user,
+                  count,
+                  _listitem[0].iTEMPRICE,
+                  count * _listitem[0].iTEMPRICE);
+            },
+          )),
     );
   }
 }
