@@ -5,8 +5,11 @@ import 'package:consumer_delivery/model/Item.dart';
 import 'package:consumer_delivery/model/ItemBrand.dart';
 import 'package:consumer_delivery/model/ItemType.dart';
 import 'package:consumer_delivery/model/Login.dart';
+import 'package:consumer_delivery/model/OrderDetail.dart';
 import 'package:consumer_delivery/model/OrderTemp.dart';
 import 'package:consumer_delivery/model/Shop.dart';
+import 'package:consumer_delivery/model/getOrder.dart';
+import 'package:consumer_delivery/model/step.dart' as step;
 import 'package:consumer_delivery/share/shareConstant.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +22,9 @@ class apiCall {
   static Shop _shop;
   static Distributor _distributor = new Distributor();
   static ITemType _iTemType;
+  static Order _order;
+  static step.Step _step;
+  static OrderDetail _orderDetail;
 
   static Future<UserLogin> login(var user, var password) async {
     var dio = new Dio();
@@ -381,6 +387,76 @@ class apiCall {
       print(resut);
     } on DioError catch (e) {
       print(e);
+    }
+  }
+
+  static Future<Order> getOrderByShopID(var shopID) async {
+    var dio = new Dio();
+    print('=== call api getOrderByShopID');
+    var data = {"SHOP_ID": shopID};
+    print(data);
+    try {
+      Response response = await dio.post(
+        ShareUrl.getOrder,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      print(response.data);
+      _order = Order.fromJson(response.data);
+      print(_order.toJson());
+
+      return _order;
+    } on DioError catch (e) {
+      print(e);
+      return _order;
+    }
+  }
+
+  static Future<step.Step> getStep(var orderNo) async {
+    var dio = new Dio();
+    print('=== call api getStep');
+    var data = {"ORDER_NO": orderNo};
+    print(data);
+    try {
+      Response response = await dio.post(
+        ShareUrl.step,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      print(response.data);
+      _step = step.Step.fromJson(response.data);
+
+      return _step;
+    } on DioError catch (e) {
+      print(e);
+      return _step;
+    }
+  }
+
+  static Future<OrderDetail> getOrderDetail(var orderNo) async {
+    var dio = new Dio();
+    print('=== call api getOrderDetail');
+    var data = {"ORDER_NO": orderNo};
+    print(data);
+    try {
+      Response response = await dio.post(
+        ShareUrl.getOrderDetail,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+        }),
+        data: jsonEncode(data),
+      );
+      print(response.data);
+      _orderDetail = OrderDetail.fromJson(response.data);
+
+      return _orderDetail;
+    } on DioError catch (e) {
+      print(e);
+      return _orderDetail;
     }
   }
 }

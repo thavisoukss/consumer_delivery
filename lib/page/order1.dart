@@ -10,6 +10,7 @@ import 'package:consumer_delivery/model/MapCal.dart' as map;
 import 'package:consumer_delivery/share/shareConstant.dart';
 import 'package:consumer_delivery/utility/dialog.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:consumer_delivery/apiCall/api.dart';
 import 'package:consumer_delivery/model/Distributor.dart' as dis;
@@ -24,6 +25,7 @@ class Order1 extends StatefulWidget {
 }
 
 class _Order1State extends State<Order1> {
+  var format_currency = NumberFormat("#,##0.00", "en_USD");
   shop.Shop _shopByID = new shop.Shop();
   List<shop.Data> _listShopByID = new List<shop.Data>();
 
@@ -168,6 +170,23 @@ class _Order1State extends State<Order1> {
     String order_ID = "WT" + formatted;
     return order_ID;
   }
+// send notification
+
+  sendNoti(var token) async {
+    FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+    await apiCall.sendNoti(
+        token: token, body: "shop id is :", title: "test noti by bee");
+    if (Platform.isAndroid) {
+      print("aaaa");
+      await firebaseMessaging.configure(onLaunch: (message) {
+        print("on Launch");
+      }, onMessage: (message) {
+        print("on message");
+      }, onResume: (message) {
+        print("on resume");
+      });
+    }
+  }
 
   // get all shop
   _getShopID() async {
@@ -208,10 +227,12 @@ class _Order1State extends State<Order1> {
         var lng1;
         var disName;
         var dis_ID;
+        var token;
         lat1 = double.parse(_listDistributor[i].lASTS);
         lng1 = double.parse(_listDistributor[i].lONGS);
         disName = _listDistributor[i].dISTRIBUTORNAME;
         dis_ID = _listDistributor[i].iD;
+        token = _listDistributor[i].tOKEN;
 
         print("calculate map");
 
@@ -222,7 +243,8 @@ class _Order1State extends State<Order1> {
             lng1: lng1,
             index: i,
             disName: disName,
-            disID: dis_ID);
+            disID: dis_ID,
+            token: token);
       }
     } catch (e) {
       print(e);
@@ -244,7 +266,8 @@ class _Order1State extends State<Order1> {
   }
 
   // short 3 shop
-  _calulatorLocation({var lat, lng, lat1, lng1, index, disName, disID}) async {
+  _calulatorLocation(
+      {var lat, lng, lat1, lng1, index, disName, disID, token}) async {
     double distanceInMeters = await Geolocator().distanceBetween(
       lat,
       lng,
@@ -255,7 +278,11 @@ class _Order1State extends State<Order1> {
     print(distanceInMeters);
 
     map.Data cal = new map.Data(
-        index: index, km: distanceInMeters, disName: disName, disID: disID);
+        index: index,
+        km: distanceInMeters,
+        disName: disName,
+        disID: disID,
+        token: token);
     setState(() {
       _listCal.add(cal);
     });
@@ -356,6 +383,11 @@ class _Order1State extends State<Order1> {
     };
     print("Call api order ");
     print(postData.toString());
+
+    for (int i = 0; i < 3; i++) {
+      print(_listCal[i].disName);
+      sendNoti(_listCal[i].token);
+    }
     try {
       Response response = await dio.post(
         ShareUrl.orders,
@@ -394,6 +426,7 @@ class _Order1State extends State<Order1> {
     _getOrderTemp();
     _getShopID();
     _getDistributor();
+
     // TODO: implement initState
     super.initState();
   }
@@ -411,9 +444,23 @@ class _Order1State extends State<Order1> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          child: Column(
-            children: [_groupOrder(), _groupBill()],
-          ),
+          child: _listorderTempData.isEmpty
+              ? Container(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 200),
+                    child: Center(
+                        child: Text(
+                      'ບໍ່ມີລາຍການ',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.red),
+                    )),
+                  ),
+                )
+              : Column(
+                  children: [_groupOrder(), _groupBill()],
+                ),
         ),
       ),
     );
@@ -489,7 +536,9 @@ class _Order1State extends State<Order1> {
                       child: orderTemp == null
                           ? Text('')
                           : Text(
-                              orderTemp.total.toString(),
+                              format_currency
+                                  .format(orderTemp.total)
+                                  .toString(),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -526,7 +575,9 @@ class _Order1State extends State<Order1> {
                                         flex: 4,
                                         child: _left(
                                             _listorderTempData[index].iTEMNAME,
-                                            _listorderTempData[index].pRICE)),
+                                            format_currency.format(
+                                                _listorderTempData[index]
+                                                    .pRICE))),
                                     Expanded(
                                       flex: 5,
                                       child: _center(
@@ -583,7 +634,7 @@ class _Order1State extends State<Order1> {
         children: [
           Container(
             child: Text(
-              subtotal.toString(),
+              format_currency.format(subtotal).toString(),
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -749,7 +800,9 @@ class _Order1State extends State<Order1> {
                       child: orderTemp == null
                           ? Text('')
                           : Text(
-                              orderTemp.total.toString(),
+                              format_currency
+                                  .format(orderTemp.total)
+                                  .toString(),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 17),
                             ),
@@ -776,7 +829,8 @@ class _Order1State extends State<Order1> {
                   child: Container(
                     child: orderTemp == null
                         ? Text('')
-                        : Text(orderTemp.total.toString(),
+                        : Text(
+                            format_currency.format(orderTemp.total).toString(),
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
                   ),

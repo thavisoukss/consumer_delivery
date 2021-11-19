@@ -26,7 +26,10 @@ class ShareUrl {
 
   static const orderTemp = "http://178.128.211.32/laoshop/api/orderTemp";
   static const orders = "http://178.128.211.32/laoshop/api/Order";
-  static const getOrder = "http://178128.211.32/laoshop/api/getOrder";
+  static const getOrder = "http://178.128.211.32/laoshop/api/getOrder";
   static const getOrderTemp = "http://178.128.211.32/laoshop/api/getOrderTemp";
   static const noti = "http://178.128.211.32/laoshop/api/noti";
+  static const step = "http://178.128.211.32/laoshop/api/getStep";
+  static const getOrderDetail =
+      "http://178.128.211.32/laoshop/api/getOrderDetail";
 }

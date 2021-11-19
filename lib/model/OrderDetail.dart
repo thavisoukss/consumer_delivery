@@ -1,12 +1,12 @@
-class OrderTemp {
+class OrderDetail {
   String status;
   String message;
   List<Data> data;
   int total;
 
-  OrderTemp({this.status, this.message, this.data, this.total});
+  OrderDetail({this.status, this.message, this.data, this.total});
 
-  OrderTemp.fromJson(Map<String, dynamic> json) {
+  OrderDetail.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
     if (json['data'] != null) {
@@ -41,8 +41,6 @@ class Data {
   String dESCRITION;
   String oRDERNO;
   String iNVOIDNO;
-  String uSERID;
-  String sTATUS;
 
   Data(
       {this.iTEMID,
@@ -54,9 +52,7 @@ class Data {
       this.sUBTOTAL,
       this.dESCRITION,
       this.oRDERNO,
-      this.iNVOIDNO,
-      this.uSERID,
-      this.sTATUS});
+      this.iNVOIDNO});
 
   Data.fromJson(Map<String, dynamic> json) {
     iTEMID = json['ITEM_ID'];
@@ -69,8 +65,6 @@ class Data {
     dESCRITION = json['DESCRITION'];
     oRDERNO = json['ORDER_NO'];
     iNVOIDNO = json['INVOID_NO'];
-    uSERID = json['USER_ID'];
-    sTATUS = json['STATUS'];
   }
 
   Map<String, dynamic> toJson() {
@@ -85,8 +79,6 @@ class Data {
     data['DESCRITION'] = this.dESCRITION;
     data['ORDER_NO'] = this.oRDERNO;
     data['INVOID_NO'] = this.iNVOIDNO;
-    data['USER_ID'] = this.uSERID;
-    data['STATUS'] = this.sTATUS;
     return data;
   }
 }

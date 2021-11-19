@@ -1,13 +1,102 @@
+import 'package:consumer_delivery/model/OrderDetail.dart';
 import 'package:flutter/material.dart';
+import 'package:consumer_delivery/model/step.dart' as step;
+import 'package:consumer_delivery/apiCall/api.dart';
+import 'package:intl/intl.dart';
 
 class Setp extends StatefulWidget {
+  final String orderID;
+
+  const Setp({Key key, this.orderID}) : super(key: key);
   @override
   _SetpState createState() => _SetpState();
 }
 
 class _SetpState extends State<Setp> {
+  var format_currency = NumberFormat("#,##0.00","en_USD");
+
   Color _colorActive = Color(0xff09b83e);
   Color _colorInActive = Colors.grey;
+
+  Color _colorOrder;
+  Color _colorAccept;
+  Color _colorSending;
+  Color _colorInvoice;
+
+  step.Step _setp;
+  List<step.Data> _liststep = [];
+
+  String aa;
+
+  OrderDetail _orderDetail;
+  List<Data> _listOrderDetail = [];
+
+  Future getStep(var orderNo) {
+    apiCall.getStep(orderNo).then((value) {
+      setState(() {
+        _setp = value;
+        _liststep = _setp.data;
+        changeColor(_liststep.length);
+      });
+    });
+  }
+
+  Future getOrderDetail(var orderNo) {
+    apiCall.getOrderDetail(orderNo).then((value) {
+      setState(() {
+        _orderDetail = value;
+        _listOrderDetail = _orderDetail.data;
+      });
+    });
+  }
+
+  changeColor(var lenght) {
+    if (lenght == 1) {
+      setState(() {
+        _colorOrder = _colorActive;
+        _colorAccept = _colorInActive;
+        _colorSending = _colorInActive;
+        _colorInvoice = _colorInActive;
+      });
+    } else if (lenght == 2) {
+      setState(() {
+        _colorOrder = _colorActive;
+        _colorAccept = _colorActive;
+        _colorSending = _colorInActive;
+        _colorInvoice = _colorInActive;
+      });
+    } else if (lenght == 3) {
+      setState(() {
+        _colorOrder = _colorActive;
+        _colorAccept = _colorActive;
+        _colorInvoice = _colorInActive;
+        _colorSending = _colorInActive;
+      });
+    } else if (lenght == 4) {
+      setState(() {
+        _colorOrder = _colorActive;
+        _colorAccept = _colorActive;
+        _colorSending = _colorActive;
+        _colorInvoice = _colorActive;
+      });
+    } else if (lenght > 4) {
+      setState(() {
+        _colorOrder = _colorActive;
+        _colorAccept = _colorActive;
+        _colorSending = _colorActive;
+        _colorInvoice = _colorActive;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    getStep(widget.orderID);
+    getOrderDetail(widget.orderID);
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +142,7 @@ class _SetpState extends State<Setp> {
             height: 60,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
-                color: _colorActive,
+                color: _colorOrder,
                 border: Border.all(color: Colors.green)),
             child: Align(
               alignment: Alignment.center,
@@ -68,7 +157,10 @@ class _SetpState extends State<Setp> {
               padding: EdgeInsets.only(top: 8),
               child: Text(
                 'ສັ່ງເຄື່ອງ',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: _colorOrder),
               ),
             ),
           )
@@ -86,7 +178,7 @@ class _SetpState extends State<Setp> {
             height: 60,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
-                color: _colorInActive,
+                color: _colorAccept,
                 border: Border.all(color: Colors.green)),
             child: Align(
               alignment: Alignment.center,
@@ -101,7 +193,10 @@ class _SetpState extends State<Setp> {
               padding: EdgeInsets.only(top: 8),
               child: Text(
                 'ຮັບເຄື່ອງ',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: _colorAccept),
               ),
             ),
           )
@@ -119,7 +214,7 @@ class _SetpState extends State<Setp> {
             height: 60,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
-                color: _colorInActive,
+                color: _colorSending,
                 border: Border.all(color: Colors.green)),
             child: Align(
               alignment: Alignment.center,
@@ -134,7 +229,10 @@ class _SetpState extends State<Setp> {
               padding: EdgeInsets.only(top: 8),
               child: Text(
                 'ກຳລັງສົ່ງ',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: _colorSending),
               ),
             ),
           )
@@ -143,7 +241,7 @@ class _SetpState extends State<Setp> {
     );
   }
 
-  Widget _stepSuccess() {
+  Widget _invoid() {
     return Container(
       child: Column(
         children: [
@@ -152,7 +250,7 @@ class _SetpState extends State<Setp> {
             height: 60,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
-                color: _colorInActive,
+                color: _colorInvoice,
                 border: Border.all(color: Colors.green)),
             child: Align(
               alignment: Alignment.center,
@@ -166,8 +264,11 @@ class _SetpState extends State<Setp> {
             child: Padding(
               padding: EdgeInsets.only(top: 8),
               child: Text(
-                'ສຳເລັດ',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                'ໃບບິນ',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: _colorSending),
               ),
             ),
           )
@@ -185,9 +286,9 @@ class _SetpState extends State<Setp> {
           _divider(),
           _stepAccept(),
           _divider(),
-          _stepSending(),
+          _invoid(),
           _divider(),
-          _stepSuccess()
+          _stepSending()
         ],
       ),
     );
@@ -239,11 +340,11 @@ class _SetpState extends State<Setp> {
     return Container(
       height: 300,
       child: ListView.builder(
-        itemCount: 5,
+        itemCount: _listOrderDetail.length,
         itemBuilder: (context, index) {
           return Column(
             children: [
-              _detail(),
+              _detail(_listOrderDetail[index], index + 1),
               Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: Container(
@@ -260,7 +361,7 @@ class _SetpState extends State<Setp> {
     );
   }
 
-  Widget _detail() {
+  Widget _detail(Data inData, var index) {
     return Container(
       height: 40,
       child: Padding(
@@ -270,7 +371,7 @@ class _SetpState extends State<Setp> {
             Expanded(
               flex: 2,
               child: Container(
-                child: Text('1'),
+                child: Text(index.toString()),
               ),
             ),
             Expanded(
@@ -283,7 +384,7 @@ class _SetpState extends State<Setp> {
                       flex: 1,
                       child: Container(
                         child: Text(
-                          'ໄມ້ຖູເຮືອນ',
+                          inData.iTEMNAME,
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15),
                         ),
@@ -291,7 +392,7 @@ class _SetpState extends State<Setp> {
                     ),
                     Container(
                       child: Text(
-                        '13,000.00',
+                        format_currency.format(inData.pRICE).toString(),
                         style: TextStyle(color: Colors.grey),
                       ),
                     )
@@ -307,7 +408,7 @@ class _SetpState extends State<Setp> {
                     Expanded(
                       child: Container(
                         child: Text(
-                          '10',
+                          inData.aMOUNT.toString(),
                           style: TextStyle(
                               color: Color(0xff09b83e),
                               fontWeight: FontWeight.bold),
@@ -316,7 +417,7 @@ class _SetpState extends State<Setp> {
                     ),
                     Container(
                       child: Text(
-                        '1,300,000.00',
+                        format_currency.format(inData.sUBTOTAL).toString(),
                         style: TextStyle(
                             color: Colors.red, fontWeight: FontWeight.bold),
                       ),
@@ -359,11 +460,15 @@ class _SetpState extends State<Setp> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 30),
-                      child: Text('1,800,000.00',
-                          style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17)),
+                      child: _orderDetail == null
+                          ? Container(
+                              child: Text(''),
+                            )
+                          : Text(format_currency.format(_orderDetail.total).toString(),
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17)),
                     )
                   ],
                 ),
@@ -382,13 +487,17 @@ class _SetpState extends State<Setp> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 30),
-                    child: Text(
-                      '1,800,000.00',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17),
-                    ),
+                    child: _orderDetail == null
+                        ? Container(
+                            child: Text(''),
+                          )
+                        : Text(
+                      format_currency.format(_orderDetail.total).toString(),
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17),
+                          ),
                   )
                 ],
               ),

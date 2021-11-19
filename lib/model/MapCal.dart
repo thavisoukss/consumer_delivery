@@ -26,14 +26,16 @@ class Data {
   int disID;
   String disName;
   double km;
+  String token;
 
-  Data({this.index, this.disID, this.disName, this.km});
+  Data({this.index, this.disID, this.disName, this.km, this.token});
 
   Data.fromJson(Map<String, dynamic> json) {
     index = json['index'];
     disID = json['disID'];
     disName = json['dis_name'];
     km = json['km'];
+    token = json['token'];
   }
 
   Map<String, dynamic> toJson() {
@@ -42,6 +44,7 @@ class Data {
     data['disID'] = this.disID;
     data['dis_name'] = this.disName;
     data['km'] = this.km;
+    data['token'] = this.token;
     return data;
   }
 }

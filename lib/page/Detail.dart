@@ -1,5 +1,6 @@
 import 'package:consumer_delivery/model/Item.dart';
 import 'package:consumer_delivery/apiCall/api.dart';
+import 'package:consumer_delivery/page/ButtomNavigator.dart';
 import 'package:consumer_delivery/share/saveUser.dart';
 import 'package:consumer_delivery/model/OrderTemp.dart' as Order;
 import 'package:consumer_delivery/utility/dialog.dart';
@@ -16,6 +17,8 @@ class Detail extends StatefulWidget {
 }
 
 class _DetailState extends State<Detail> {
+
+  var format_currency = NumberFormat("#,##0.00","en_USD");
   var count = 0;
   bool count_staus = true;
   var user;
@@ -84,8 +87,20 @@ class _DetailState extends State<Detail> {
 
       if (res == 'success') {
         showSuccessMessage(context, 'ສັ່ງສີນຄ້າສຳເລັດ');
+         Future.delayed(Duration(seconds: 3), () {
+            Navigator.pushReplacement(
+              context,
+              new MaterialPageRoute(builder: (context) => ButtomNavigation()),
+            );
+          });
       } else {
         showErrorMessage(context, 'ສັ່ງສີນຄ້າບໍ່ສຳເລັດ');
+         Future.delayed(Duration(seconds: 3), () {
+            Navigator.pushReplacement(
+              context,
+              new MaterialPageRoute(builder: (context) => ButtomNavigation()),
+            );
+          });
       }
     });
   }
@@ -256,7 +271,7 @@ class _DetailState extends State<Detail> {
                     child: Container(
                       child: _listitem.isEmpty
                           ? Text('')
-                          : Text(_listitem[0].iTEMPRICE.toString()),
+                          : Text(format_currency.format(_listitem[0].iTEMPRICE).toString()),
                     ),
                   ),
                 ],

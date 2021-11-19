@@ -38,11 +38,11 @@ class Data {
   String dELIVERYDATE;
   int tOTALAMOUNT;
   String cCY;
-  int iNVOIDNO;
+  String iNVOIDNO;
   String sTATUS;
   int dISTRIBUTORID;
   String dISTRIBUTORNAME;
-  int dELIVERYNO;
+  String dELIVERYNO;
 
   Data(
       {this.iD,

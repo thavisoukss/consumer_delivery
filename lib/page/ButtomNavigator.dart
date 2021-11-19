@@ -1,8 +1,8 @@
 import 'package:consumer_delivery/page/Dashbord.dart';
-import 'package:consumer_delivery/page/History.dart';
-import 'package:consumer_delivery/page/Home.dart';
-import 'package:consumer_delivery/page/order.dart';
+import 'package:consumer_delivery/page/ListOrder.dart';
+import 'package:consumer_delivery/page/Search.dart';
 import 'package:consumer_delivery/page/Setp.dart';
+import 'package:consumer_delivery/page/TestNoti.dart';
 import 'package:consumer_delivery/page/order1.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +13,7 @@ class ButtomNavigation extends StatefulWidget {
 
 class _ButtomNavigationState extends State<ButtomNavigation> {
   int _currentIndex = 0;
-  List<Widget> _child = [DashBord(), Order1(), History(), Setp()];
+  List<Widget> _child = [DashBord(), Order1(), ListOrder(), Setp()];
 
   void _onTapBar(int index) {
     setState(() {
@@ -36,16 +36,16 @@ class _ButtomNavigationState extends State<ButtomNavigation> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.history),
-              title: Text('ລາຍການສັ່ງສິນຄ້າ'),
+              title: Text('ກຳລັງສັ່ງສິນຄ້າ'),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.add_shopping_cart),
-              title: Text('ລາຍການສັ່ງຍ້ອນຫລັງ'),
+              title: Text('ສັ່ງສິນຄ້າເເລ້ວ'),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_active),
-              title: Text('ລາຍງານ'),
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.notifications_active),
+            //   title: Text('ລາຍງານ'),
+            // ),
           ]),
     );
   }

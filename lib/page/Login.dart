@@ -1,8 +1,10 @@
 import 'package:consumer_delivery/apiCall/api.dart';
 import 'package:consumer_delivery/model/Login.dart';
 import 'package:consumer_delivery/page/ButtomNavigator.dart';
+import 'package:consumer_delivery/page/TestNoti.dart';
 import 'package:consumer_delivery/share/saveUser.dart';
 import 'package:consumer_delivery/utility/dialog.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -15,6 +17,7 @@ class _LoginState extends State<Login> {
   UserLogin _userlogin;
   final userController = TextEditingController();
   final passwordController = TextEditingController();
+  String token;
 
   _shareUser(var name, var user) {
     saveUser(shareName: name, value: user);
@@ -42,6 +45,27 @@ class _LoginState extends State<Login> {
     } on Exception catch (_) {
       showErrorMessage(context, 'some thing wrong');
     }
+  }
+
+  logins() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => TestNoti()));
+  }
+
+  getToken() async {
+    FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+    String getToken = await firebaseMessaging.getToken();
+    setState(() {
+      token = getToken;
+    });
+    print("my token is " + token);
+  }
+
+  @override
+  void initState() {
+    getToken();
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
@@ -190,6 +214,7 @@ class _LoginState extends State<Login> {
           padding: EdgeInsets.all(8.0),
           onPressed: () {
             _login();
+            //logins();
           },
           child: Text(
             "ເຂົ້າສູ່ລະບົບ".toUpperCase(),

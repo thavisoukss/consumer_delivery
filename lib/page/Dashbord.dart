@@ -1,5 +1,6 @@
 import 'package:consumer_delivery/model/ItemType.dart' as ItemType;
 import 'package:consumer_delivery/page/Detail.dart';
+import 'package:consumer_delivery/page/Search.dart';
 import 'package:consumer_delivery/page/listITemBrandByID.dart';
 import 'package:flutter/material.dart';
 import 'package:consumer_delivery/apiCall/api.dart';
@@ -82,26 +83,42 @@ class _DashBordState extends State<DashBord> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  height: 40,
-                  child: Icon(
-                    Icons.search_rounded,
-                    color: Colors.white,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Container(
-                    child: Text(
-                      'ຄົ້ນຫາສິນຄ້າ.....',
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Search()),
+                );
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 40,
+                    child: Icon(
+                      Icons.search_rounded,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Search()),
+                        );
+                      },
+                      child: Container(
+                        child: Text(
+                          'ຄົ້ນຫາສິນຄ້າ.....',
+                          style: TextStyle(fontSize: 14, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Container(
               width: 250,

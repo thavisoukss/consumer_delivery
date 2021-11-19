@@ -1,11 +1,11 @@
-class ITemType {
+class Step {
   String status;
   String message;
   List<Data> data;
 
-  ITemType({this.status, this.message, this.data});
+  Step({this.status, this.message, this.data});
 
-  ITemType.fromJson(Map<String, dynamic> json) {
+  Step.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
     if (json['data'] != null) {
@@ -28,26 +28,26 @@ class ITemType {
 }
 
 class Data {
-  int iD;
-  String iTEMTYPENAME;
-  String iTEMTYPEDESC;
-  int cATEGORYID;
+  String rEFNAME;
+  String rEFNO;
+  String rEFDATE;
+  String oRDERNO;
 
-  Data({this.iD, this.iTEMTYPENAME, this.iTEMTYPEDESC, this.cATEGORYID});
+  Data({this.rEFNAME, this.rEFNO, this.rEFDATE, this.oRDERNO});
 
   Data.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
-    iTEMTYPENAME = json['ITEM_TYPE_NAME'];
-    iTEMTYPEDESC = json['ITEM_TYPE_DESC'];
-    cATEGORYID = json['CATEGORY_ID'];
+    rEFNAME = json['REF_NAME'];
+    rEFNO = json['REF_NO'];
+    rEFDATE = json['REF_DATE'];
+    oRDERNO = json['ORDER_NO'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['ID'] = this.iD;
-    data['ITEM_TYPE_NAME'] = this.iTEMTYPENAME;
-    data['ITEM_TYPE_DESC'] = this.iTEMTYPEDESC;
-    data['CATEGORY_ID'] = this.cATEGORYID;
+    data['REF_NAME'] = this.rEFNAME;
+    data['REF_NO'] = this.rEFNO;
+    data['REF_DATE'] = this.rEFDATE;
+    data['ORDER_NO'] = this.oRDERNO;
     return data;
   }
 }

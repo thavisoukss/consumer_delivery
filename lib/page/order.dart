@@ -22,7 +22,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:intl/intl.dart'; //for date format
-import 'package:intl/intl.dart';
 
 class Order extends StatefulWidget {
   @override
@@ -30,6 +29,8 @@ class Order extends StatefulWidget {
 }
 
 class _OrderState extends State<Order> {
+  var format_currency = NumberFormat("#,##0.00", "en_USD");
+
   GoogleMapController mapController;
   LatLng _initialPosition = LatLng(0.0, 0.0);
   OrderTemp orderTemp;
